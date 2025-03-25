@@ -8,9 +8,9 @@ services:
       - 9010:9000
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
-      - /home/hohoanghvy/IdeaProjects/hadoop-lab/input:/data/input
-      - /home/hohoanghvy/IdeaProjects/hadoop-lab/output:/data/output
-      - /home/hohoanghvy/IdeaProjects/hadoop-lab/target:/user/hadoop/target
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/input:/data/input
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/output:/data/output
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project/target:/user/hadoop/target
     environment:
       - CLUSTER_NAME=test
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
@@ -123,8 +123,7 @@ services:
     container_name: java-dev
     restart: no
     volumes:
-      - /home/hohoanghvy/IdeaProjects/hadoop-lab:/app  # Mount local project
-      - /home/hohoanghvy/hadoop-lab/lib:/app/lib
+      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project:/app  # Mount local project
       - maven_cache:/root/.m2  # Persistent Maven cache
     working_dir: /app
     command: tail -f /dev/null  # Keep container running
