@@ -1,15 +1,16 @@
-version: "3"
-
 services:
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
     container_name: namenode
-    restart: always
+    restart: no
     ports:
       - 9870:9870
       - 9010:9000
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
+      - /home/hohoanghvy/IdeaProjects/hadoop-lab/input:/data/input
+      - /home/hohoanghvy/IdeaProjects/hadoop-lab/output:/data/output
+      - /home/hohoanghvy/IdeaProjects/hadoop-lab/target:/user/hadoop/target
     environment:
       - CLUSTER_NAME=test
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
@@ -19,7 +20,7 @@ services:
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     container_name: datanode
-    restart: always
+    restart: no
     volumes:
       - hadoop_datanode:/hadoop/dfs/data
     environment:
@@ -33,7 +34,7 @@ services:
   resourcemanager:
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
     container_name: resourcemanager
-    restart: always
+    restart: no
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864"
     env_file:
@@ -42,7 +43,7 @@ services:
   nodemanager1:
     image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
     container_name: nodemanager
-    restart: always
+    restart: no
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
@@ -51,7 +52,7 @@ services:
   historyserver:
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
     container_name: historyserver
-    restart: always
+    restart: no
     environment:
       SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
     volumes:
@@ -66,7 +67,7 @@ services:
       - namenode
       - datanode
     ports:
-      - "8080:8080"
+      - "8082:8080"
       - "7077:7077"
     environment:
       - INIT_DAEMON_STEP=setup_spark
@@ -78,7 +79,7 @@ services:
     depends_on:
       - spark-master
     ports:
-      - "8081:8081"
+      - "8083:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
       - CORE_CONF_fs_defaultFS=hdfs://namenode:9000
@@ -117,9 +118,23 @@ services:
     container_name: presto-coordinator
     ports:
       - "8089:8089"
-
+  java-dev:
+    image: maven:3.6.3-openjdk-8
+    container_name: java-dev
+    restart: no
+    volumes:
+      - /home/hohoanghvy/IdeaProjects/hadoop-lab:/app  # Mount local project
+      - /home/hohoanghvy/hadoop-lab/lib:/app/lib
+      - maven_cache:/root/.m2  # Persistent Maven cache
+    working_dir: /app
+    command: tail -f /dev/null  # Keep container running
+    environment:
+      - JAVA_HOME=/usr/local/openjdk-8
+      - PATH=/usr/local/openjdk-8/bin:$PATH
+    ports:
+      - "5005:5005"
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
-
+  maven_cache:
