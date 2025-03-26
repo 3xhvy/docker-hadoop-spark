@@ -118,22 +118,7 @@ services:
     container_name: presto-coordinator
     ports:
       - "8089:8089"
-  java-dev:
-    image: maven:3.6.3-openjdk-8
-    container_name: java-dev
-    restart: no
-    volumes:
-      - /home/hohoanghvy/IdeaProjects/hadoop-spark-project:/app  # Mount local project
-      - maven_cache:/root/.m2  # Persistent Maven cache
-    working_dir: /app
-    command: tail -f /dev/null  # Keep container running
-    environment:
-      - JAVA_HOME=/usr/local/openjdk-8
-      - PATH=/usr/local/openjdk-8/bin:$PATH
-    ports:
-      - "5005:5005"
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
-  maven_cache:
