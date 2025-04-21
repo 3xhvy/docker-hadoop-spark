@@ -1,0 +1,48 @@
+FROM bitnami/spark:3.4.2
+
+USER 0
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        wget \
+        curl \
+        build-essential \
+        zlib1g-dev \
+        libncurses5-dev \
+        libgdbm-dev \
+        libnss3-dev \
+        libssl-dev \
+        libreadline-dev \
+        libffi-dev \
+        ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python 3.10
+RUN wget https://www.python.org/ftp/python/3.10.13/Python-3.10.13.tgz && \
+    tar -xf Python-3.10.13.tgz && \
+    cd Python-3.10.13 && \
+    ./configure --enable-optimizations && \
+    make -j $(nproc) && \
+    make altinstall && \
+    cd .. && \
+    rm -rf Python-3.10.13*
+
+# Update symlinks and environment to use Python 3.10 as default
+RUN ln -sf /usr/local/bin/python3.10 /usr/bin/python && \
+    ln -sf /usr/local/bin/python3.10 /usr/bin/python3 && \
+    ln -sf /usr/local/bin/python3.10 /opt/bitnami/python/bin/python && \
+    ln -sf /usr/local/bin/python3.10 /opt/bitnami/python/bin/python3
+
+# Override PATH to prioritize the new Python installation
+ENV PATH="/usr/local/bin:$PATH"
+
+# Verify the correct Python version is active
+RUN which python && python --version && \
+    which python3 && python3 --version && \
+    python3 -m pip --version || true  # pip might not be installed yet
+
+# Optional: Install pip for Python 3.10 if needed
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+
