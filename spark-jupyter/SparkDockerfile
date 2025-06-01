@@ -49,10 +49,6 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 # Install required Python packages
 RUN pip3.10 install pyspark==3.4.2 numpy pandas
 
-# Download and install GraphFrames
+# Install correct GraphFrames version for Spark 3.4
 RUN mkdir -p /opt/spark/jars && \
-    wget -P /opt/spark/jars/ https://repos.spark-packages.org/graphframes/graphframes/0.8.2-spark3.2-s_2.12/graphframes-0.8.2-spark3.2-s_2.12.jar
-
-# Set environment variables for GraphFrames
-ENV PYSPARK_SUBMIT_ARGS="--packages graphframes:graphframes:0.8.2-spark3.2-s_2.12 pyspark-shell"
-
+    wget -P /opt/spark/jars/ https://repos.spark-packages.org/graphframes/graphframes/0.8.3-spark3.4-s_2.12/graphframes-0.8.3-spark3.4-s_2.12.jar
